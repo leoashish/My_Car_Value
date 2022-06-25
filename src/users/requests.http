@@ -1,0 +1,12 @@
+##Create a new User
+
+POST http://localhost:3000/auth/signup
+content-type: application/json
+
+{
+	"email": "ashish.singh@optym.com",
+	"password": "BhagBSDK"
+}
+
+GET http://localhost:3000/auth/1
+content-type: aplication/json
