@@ -1,7 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query,Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query,NotFoundException,UseInterceptors,ClassSerializerInterceptor }from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+@Serialize(UserDto)
 @Controller('auth')
 export class UsersController {
     constructor(private userService: UsersService) {
@@ -12,9 +15,14 @@ export class UsersController {
         this.userService.create(body.email , body.password);
     }
 
+    
     @Get("/:id")
     async getUser(@Param("id") id: string){
-        return await this.userService.findOne(parseInt(id));
+        const result = await this.userService.findOne(parseInt(id));
+        if(!(result)){
+            throw new NotFoundException("Not Found Exception");
+        }
+        return result;
     }
 
     @Get()
@@ -22,8 +30,8 @@ export class UsersController {
         return await this.userService.find(email);
     }
     
-    @Put("/:id")
-    async updateAUser(@Body() body:UpdateUserDto,@Param("id") id:string){
+    @Patch("/:id")
+    async updateAUser( @Param("id") id:string , @Body() body:UpdateUserDto){
         return  this.userService.update(parseInt(id) , body);
     }
 
